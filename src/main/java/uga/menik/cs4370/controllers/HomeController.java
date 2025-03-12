@@ -7,8 +7,11 @@ package uga.menik.cs4370.controllers;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +21,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import uga.menik.cs4370.models.Post;
 import uga.menik.cs4370.utility.Utility;
+import uga.menik.cs4370.services.PeopleService;
+import uga.menik.cs4370.services.UserService;
+
+
 
 /**
  * This controller handles the home page and some of it's sub URLs.
@@ -33,6 +40,16 @@ public class HomeController {
      * The value to this parameter can be shown to the user as an error message.
      * See notes in HashtagSearchController.java regarding URL parameters.
      */
+    private final UserService userService;
+    private final PeopleService peopleService;
+
+
+     @Autowired
+    public HomeController(PeopleService peopleService,UserService userService) {
+        this.userService = userService;
+        this.peopleService = peopleService; 
+    }
+
     @GetMapping
     public ModelAndView webpage(@RequestParam(name = "error", required = false) String error) {
         // See notes on ModelAndView in BookmarksController.java.
@@ -40,7 +57,13 @@ public class HomeController {
 
         // Following line populates sample data.
         // You should replace it with actual data from the database.
-        List<Post> posts = Utility.createSamplePostsListWithoutComments();
+        List<Post> posts = new ArrayList<>();
+        
+        try{
+            posts = peopleService.getCreatedPosts(userService.getLoggedInUser().getUserId());
+         }catch(SQLException e){
+
+        }
         mv.addObject("posts", posts);
 
         // If an error occured, you can set the following property with the
@@ -67,14 +90,24 @@ public class HomeController {
     @PostMapping("/createpost")
     public String createPost(@RequestParam(name = "posttext") String postText) {
         System.out.println("User is creating post: " + postText);
-
+        
         // Redirect the user if the post creation is a success.
         // return "redirect:/";
-
+        try{
+            boolean postSuccess = userService.createPost(postText, userService.getLoggedInUser().getUserId());
+            if(postSuccess){
+                return "redirect:/";
+            }else{
+                String message = URLEncoder.encode("Failed to create the post. Please try again.",
+                StandardCharsets.UTF_8);
+        return "redirect:/?error=" + message;
+            }
+        }catch(Exception e){
         // Redirect the user with an error message if there was an error.
         String message = URLEncoder.encode("Failed to create the post. Please try again.",
                 StandardCharsets.UTF_8);
         return "redirect:/?error=" + message;
+        }
     }
 
 }
