@@ -7,6 +7,7 @@ package uga.menik.cs4370.controllers;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,14 @@ public class PeopleController {
     // Inject UserService and PeopleService instances.
     // See LoginController.java to see how to do this.
     // Hint: Add a constructor with @Autowired annotation.
+    private final UserService userService;
+    private final PeopleService peopleService;
+
+    @Autowired
+    public PeopleController(UserService userService, PeopleService peopleService) {
+        this.userService = userService;
+        this.peopleService = peopleService;
+    }
 
     /**
      * Serves the /people web page.
@@ -49,8 +58,12 @@ public class PeopleController {
         // You should replace it with actual data from the database.
         // Use the PeopleService instance to find followable users.
         // Use UserService to access logged in userId to exclude.
-        List<FollowableUser> followableUsers = Utility.createSampleFollowableUserList();
-        mv.addObject("users", followableUsers);
+        try {
+            List<FollowableUser> followableUsers = peopleService.getFollowableUsers(userService.getLoggedInUser().getUserId());
+            mv.addObject("users", followableUsers);
+        } catch (SQLException e) {
+            System.out.println("Failed followable users");
+        }
 
         // If an error occured, you can set the following property with the
         // error message to show the error message to the user.
