@@ -132,7 +132,7 @@ public class UserService {
     }
 
     public boolean createPost(String content, String userId) throws SQLException{
-        final String postSql = "insert into post (content,userId) values (?,?)";
+        final String postSql = "insert into post (content,userId,date) values (?,?,NOW())";
 
         try(Connection conn = dataSource.getConnection();
         PreparedStatement sqlStmt = conn.prepareStatement(postSql)){

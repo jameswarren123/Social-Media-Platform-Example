@@ -75,7 +75,7 @@ public class PeopleService {
     }
     
     public List<Post> getCreatedPosts(String userId) throws SQLException{
-        final String sql = "select * from post where userId = ?"; 
+        final String sql = "select * from post where userId = ? order by date desc"; 
 
 
      
@@ -85,7 +85,7 @@ public class PeopleService {
                 pstmt.setString(1, userId);
                 try(ResultSet rs = pstmt.executeQuery()){
                     while(rs.next()){
-                        posts.add(new Post(rs.getString("postId"), rs.getString("content"), "Mar 07, 2024, 10:54 PM", userService.getLoggedInUser(), 0, 0, false, false));
+                        posts.add(new Post(rs.getString("postId"), rs.getString("content"), rs.getString("date"), userService.getLoggedInUser(), 0, 0, false, false));
                     }
                 }
 
