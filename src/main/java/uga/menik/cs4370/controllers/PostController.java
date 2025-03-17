@@ -7,8 +7,10 @@ package uga.menik.cs4370.controllers;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import uga.menik.cs4370.models.ExpandedPost;
 import uga.menik.cs4370.utility.Utility;
+import uga.menik.cs4370.services.PostService;
+import uga.menik.cs4370.services.UserService;
 
 /**
  * Handles /post URL and its sub urls.
@@ -26,6 +30,15 @@ import uga.menik.cs4370.utility.Utility;
 @Controller
 @RequestMapping("/post")
 public class PostController {
+
+    private final PostService postService;
+    private final UserService userService;
+
+    @Autowired
+    public PostController(PostService postService, UserService userService) {
+        this.postService = postService;
+        this.userService = userService;
+    }
 
     /**
      * This function handles the /post/{postId} URL.
@@ -41,14 +54,18 @@ public class PostController {
     public ModelAndView webpage(@PathVariable("postId") String postId,
             @RequestParam(name = "error", required = false) String error) {
         System.out.println("The user is attempting to view post with id: " + postId);
+
         // See notes on ModelAndView in BookmarksController.java.
         ModelAndView mv = new ModelAndView("posts_page");
 
         // Following line populates sample data.
         // You should replace it with actual data from the database.
-        List<ExpandedPost> posts = Utility.createSampleExpandedPostWithComments();
-        mv.addObject("posts", posts);
-
+        try {
+            List<ExpandedPost> posts = postService.getPostComments(postId);
+            mv.addObject("posts", posts);
+        } catch (SQLException e) {
+            System.out.println("failed to get comments");
+        }
         // If an error occured, you can set the following property with the
         // error message to show the error message to the user.
         // An error message can be optionally specified with a url query parameter too.
@@ -77,17 +94,28 @@ public class PostController {
 
         // Redirect the user if the comment adding is a success.
         // return "redirect:/post/" + postId;
-
-        // Redirect the user with an error message if there was an error.
-        String message = URLEncoder.encode("Failed to post the comment. Please try again.",
+        try {
+            boolean commentSuccess = postService.createComment(comment, postId, userService.getLoggedInUser());
+            if (commentSuccess) {
+                return "redirect:/post/" + postId;
+            } else {
+                String message = URLEncoder.encode("Failed to create the comment. Please try again.",
                 StandardCharsets.UTF_8);
-        return "redirect:/post/" + postId + "?error=" + message;
+                return "redirect:/?error=" + message;
+            }
+        } catch (Exception e) {
+            // Redirect the user with an error message if there was an error.
+            String message = URLEncoder.encode("Failed to post the comment. Please try again.",
+                    StandardCharsets.UTF_8);
+            return "redirect:/post/" + postId + "?error=" + message;
+        }
     }
 
     /**
      * Handles likes added on posts.
      * See comments on webpage function to see how path variables work here.
-     * See comments in PeopleController.java in followUnfollowUser function regarding 
+     * See comments in PeopleController.java in followUnfollowUser function
+     * regarding
      * get type form submissions and how path variables work.
      */
     @GetMapping("/{postId}/heart/{isAdd}")
@@ -99,17 +127,28 @@ public class PostController {
 
         // Redirect the user if the comment adding is a success.
         // return "redirect:/post/" + postId;
-
-        // Redirect the user with an error message if there was an error.
-        String message = URLEncoder.encode("Failed to (un)like the post. Please try again.",
+        try {
+            boolean likeSuccess = postService.likePost(isAdd, postId, userService.getLoggedInUser());
+            if (likeSuccess) {
+                return "redirect:/post/" + postId;
+            } else {
+                String message = URLEncoder.encode("Failed to create the like. Please try again.",
                 StandardCharsets.UTF_8);
-        return "redirect:/post/" + postId + "?error=" + message;
+                return "redirect:/?error=" + message;
+            }
+        } catch (Exception e) {
+            // Redirect the user with an error message if there was an error.
+            String message = URLEncoder.encode("Failed to (un)like the post. Please try again.",
+                StandardCharsets.UTF_8);
+            return "redirect:/post/" + postId + "?error=" + message;
+        }
     }
 
     /**
      * Handles bookmarking posts.
      * See comments on webpage function to see how path variables work here.
-     * See comments in PeopleController.java in followUnfollowUser function regarding 
+     * See comments in PeopleController.java in followUnfollowUser function
+     * regarding
      * get type form submissions.
      */
     @GetMapping("/{postId}/bookmark/{isAdd}")
@@ -121,11 +160,21 @@ public class PostController {
 
         // Redirect the user if the comment adding is a success.
         // return "redirect:/post/" + postId;
-
-        // Redirect the user with an error message if there was an error.
-        String message = URLEncoder.encode("Failed to (un)bookmark the post. Please try again.",
+        try {
+            boolean bookmarkSuccess = postService.bookmarkPost(isAdd, postId, userService.getLoggedInUser());
+            if (bookmarkSuccess) {
+                return "redirect:/post/" + postId;
+            } else {
+                String message = URLEncoder.encode("Failed to create the bookmark. Please try again.",
                 StandardCharsets.UTF_8);
-        return "redirect:/post/" + postId + "?error=" + message;
+                return "redirect:/?error=" + message;
+            }
+        } catch (Exception e) {
+            // Redirect the user with an error message if there was an error.
+            String message = URLEncoder.encode("Failed to (un)bookmark the post. Please try again.",
+                StandardCharsets.UTF_8);
+            return "redirect:/post/" + postId + "?error=" + message;
+        }
     }
 
 }

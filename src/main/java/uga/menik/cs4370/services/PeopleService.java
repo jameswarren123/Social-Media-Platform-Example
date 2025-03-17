@@ -15,14 +15,11 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.SessionScope;
 
 import uga.menik.cs4370.models.FollowableUser;
 import uga.menik.cs4370.models.Post;
-import uga.menik.cs4370.utility.Utility;
 
 
 
