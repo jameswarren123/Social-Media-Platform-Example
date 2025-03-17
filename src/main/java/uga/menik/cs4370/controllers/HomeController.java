@@ -100,7 +100,7 @@ public class HomeController {
             }else{
                 String message = URLEncoder.encode("Failed to create the post. Please try again.",
                 StandardCharsets.UTF_8);
-        return "redirect:/?error=" + message;
+                return "redirect:/?error=" + message;
             }
         }catch(Exception e){
         // Redirect the user with an error message if there was an error.
