@@ -73,6 +73,11 @@ public class PostController {
         // Following line populates sample data.
         // You should replace it with actual data from the database.
         try {
+            System.out.println("");
+            System.out.println("");
+            System.out.println(postId);
+            System.out.println("");
+            System.out.println("");
             List<ExpandedPost> posts = postService.getPostComments(postId);
             mv.addObject("posts", posts);
         } catch (SQLException e) {
