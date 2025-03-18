@@ -51,6 +51,7 @@ public class PostService {
             pstmt.setString(1, postId);
             pstmt.setString(2, userId);
             try(ResultSet rs = pstmt.executeQuery()) {
+                rs.next();
                 if(Integer.parseInt(rs.getString("row_count")) > 0) bookmarked = true;           
             }
         }
@@ -65,6 +66,7 @@ public class PostService {
             pstmt.setString(1, postId);
             pstmt.setString(2, userId);
             try(ResultSet rs = pstmt.executeQuery()) {
+                rs.next();
                 if(Integer.parseInt(rs.getString("row_count")) > 0) hearted = true;           
             }
         }
@@ -78,6 +80,7 @@ public class PostService {
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, postId);
             try(ResultSet rs = pstmt.executeQuery()) {
+                rs.next();
                 commentCount = Integer.parseInt(rs.getString("row_count"));
             }
         }
@@ -91,6 +94,7 @@ public class PostService {
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, postId);
             try(ResultSet rs = pstmt.executeQuery()) {
+                rs.next();
                 heartCount = Integer.parseInt(rs.getString("row_count"));
             }
         }
@@ -104,6 +108,7 @@ public class PostService {
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, userId);
             try(ResultSet rs = pstmt.executeQuery()) {
+                rs.next();
                 user = new User(userId, rs.getString("firstName"), rs.getString("lastName"));
             }
         }
@@ -140,11 +145,16 @@ public class PostService {
                 while (rs.next()) {
                     content = rs.getString("content");
                     postDate = rs.getString("date");
+                    System.out.println("through post");
                     user = this.getUser(rs.getString("userId"));
                     heartsCount = this.getHeartCount(postId);
+                    System.out.println("through get heart count");
                     commentsCount = this.getCommentCount(postId);
-                    isHearted = this.userHearted(postId, userService.getLoggedInUser().getUserId());    
+                    System.out.println("through get comment count");
+                    isHearted = this.userHearted(postId, userService.getLoggedInUser().getUserId());  
+                    System.out.println("through user hearted count");  
                     isBookmarked = this.userBookmarked(postId, userService.getLoggedInUser().getUserId());
+                    System.out.println("through get bookmarked count");
                 }
             }
         }
