@@ -43,7 +43,7 @@ public class PostService {
         this.userService = userService;
     }
 
-    private boolean userBookmarked(String postId, String userId) throws SQLException {
+     boolean userBookmarked(String postId, String userId) throws SQLException {
         boolean bookmarked = false;
         final String sql = "select count(*) as row_count from bookmark where postId = ? and userId = ?";
         try (Connection conn = dataSource.getConnection();
@@ -58,7 +58,7 @@ public class PostService {
         return bookmarked;
     }
 
-    private boolean userHearted(String postId, String userId) throws SQLException {
+     boolean userHearted(String postId, String userId) throws SQLException {
         boolean hearted = false;
         final String sql = "select count(*) as row_count from heart where postId = ? and userId = ?";
         try (Connection conn = dataSource.getConnection();
@@ -73,7 +73,7 @@ public class PostService {
         return hearted;
     }
 
-    private int getCommentCount(String postId) throws SQLException {
+     int getCommentCount(String postId) throws SQLException {
         int commentCount = 0;
         final String sql = "select count(*) as row_count from comment where postId = ?";
         try (Connection conn = dataSource.getConnection();
@@ -87,7 +87,7 @@ public class PostService {
         return commentCount;
     }
 
-    private int getHeartCount(String postId) throws SQLException {
+     int getHeartCount(String postId) throws SQLException {
         int heartCount = 0;
         final String sql = "select count(*) as row_count from heart where postId = ?";
         try (Connection conn = dataSource.getConnection();
@@ -101,7 +101,7 @@ public class PostService {
         return heartCount;
     }
 
-    private User getUser(String userId) throws SQLException {
+     User getUser(String userId) throws SQLException {
         final String sql = "select * from user where userId = ?";
         User user = null;
         try (Connection conn = dataSource.getConnection();

@@ -20,6 +20,7 @@ import org.springframework.web.context.annotation.SessionScope;
 
 import uga.menik.cs4370.models.FollowableUser;
 import uga.menik.cs4370.models.Post;
+import uga.menik.cs4370.services.PostService;;
 
 /**
  * =============================================================================
@@ -49,11 +50,13 @@ public class PeopleService {
      */
     private final DataSource dataSource;
     private final UserService userService;
+    private final PostService postService;
 
     @Autowired
-    public PeopleService(DataSource dataSource, UserService userService) {
+    public PeopleService(DataSource dataSource, UserService userService, PostService postService) {
         this.dataSource = dataSource;
         this.userService = userService;
+        this.postService = postService;
     }
 
     // ====================================================================================================
@@ -105,7 +108,7 @@ public class PeopleService {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     posts.add(new Post(rs.getString("postId"), rs.getString("content"), rs.getString("date"),
-                            userService.getLoggedInUser(), 0, 0, false, false));
+                            userService.getLoggedInUser(), postService.getHeartCount(rs.getString("postId")), postService.getCommentCount(rs.getString("postId")), postService.userHearted(rs.getString("postId"),userService.getLoggedInUser().getUserId()), postService.userBookmarked(rs.getString("postId"),userService.getLoggedInUser().getUserId())));
                 }
             }
 
