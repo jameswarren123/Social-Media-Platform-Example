@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,13 +62,11 @@ public class PeopleService {
 
     // ====================================================================================================
     public List<FollowableUser> getFollowableUsers(String userIdToExclude) throws SQLException {
-        // Write an SQL query to find the users that are not the current user.
         final String sql = "SELECT u.userId, u.firstName, u.lastName, " +
-                "EXISTS (SELECT 1 FROM follow f WHERE f.followerId = ? AND f.followedId = u.userId) AS isFollowed " +
+                "EXISTS (SELECT 1 FROM follow f WHERE f.followerId = ? AND f.followedId = u.userId) AS isFollowed, " +
+                "(SELECT MAX(p.created_at) FROM post p WHERE p.userId = u.userId) AS lastPostDate " +
                 "FROM user u WHERE u.userId != ?";
-        // Run the query with a datasource.
-        // See UserService.java to see how to inject DataSource instance and
-        // use it to run a query.
+
         List<FollowableUser> followableUsers = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
@@ -78,22 +77,22 @@ public class PeopleService {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     boolean isFollowed = rs.getBoolean("isFollowed");
+
+                    // Retrieve and format the date
+                    java.sql.Timestamp lastPostTimestamp = rs.getTimestamp("lastPostDate");
+                    String formattedDate = (lastPostTimestamp != null)
+                            ? new SimpleDateFormat("MMM dd, yyyy, hh:mm a").format(lastPostTimestamp)
+                            : "(No Posts)";
+
                     followableUsers.add(new FollowableUser(
                             rs.getString("userId"),
                             rs.getString("firstName"),
                             rs.getString("lastName"),
                             isFollowed,
-                            "Mar 02, 2024, 08:15 PM"));
+                            formattedDate));
                 }
             }
         }
-        // Use the query result to create a list of followable users.
-        // See UserService.java to see how to access rows and their attributes
-        // from the query result.
-        // Check the following createSampleFollowableUserList function to see
-        // how to create a list of FollowableUsers.
-
-        // Replace the following line and return the list you created.
         return followableUsers;
     }
     // ====================================================================================================
@@ -119,7 +118,7 @@ public class PeopleService {
     }
 
     // ====================================================================================================
-    public boolean updateFollowStatus(String followerId, String followedId, boolean isFollow) throws SQLException {
+    public void updateFollowStatus(String followerId, String followedId, boolean isFollow) throws SQLException {
         final String sql = isFollow
                 ? "INSERT INTO follow (followerId, followedId) VALUES (?, ?)" // Follow
                 : "DELETE FROM follow WHERE followerId = ? AND followedId = ?"; // Unfollow
@@ -130,7 +129,6 @@ public class PeopleService {
             stmt.setString(2, followedId);
             stmt.executeUpdate();
         }
-        return isFollow;
     }
     // ====================================================================================================
 }
