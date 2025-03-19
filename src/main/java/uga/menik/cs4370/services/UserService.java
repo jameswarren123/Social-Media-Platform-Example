@@ -55,6 +55,7 @@ public class UserService {
     public boolean authenticate(String username, String password) throws SQLException {
         // Note the ? mark in the query. It is a place holder that we will later replace.
         final String sql = "select * from user where username = ?";
+
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -78,6 +79,7 @@ public class UserService {
                         // Initialize and retain the logged in user.
                         loggedInUser = new User(userId, firstName, lastName);
                     }
+
                     return isPassMatch;
                 }
             }

@@ -21,6 +21,7 @@ import org.springframework.web.context.annotation.SessionScope;
 
 import uga.menik.cs4370.models.FollowableUser;
 import uga.menik.cs4370.models.Post;
+import uga.menik.cs4370.models.User;
 import uga.menik.cs4370.services.PostService;;
 
 /**
@@ -98,16 +99,23 @@ public class PeopleService {
     // ====================================================================================================
 
     public List<Post> getCreatedPosts(String userId) throws SQLException {
-        final String sql = "select * from post where userId = ? order by date desc";
+        final String sql = "select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from post p, user u, follow f where u.userId = ? and u.userId = p.userId and p.userId = f.followerId) order by date desc;";
 
         List<Post> posts = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, userId);
+            pstmt.setString(2, userId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
+                    String postUserId = rs.getString("userId");
+                    String firstName = rs.getString("firstName");
+                    String lastName = rs.getString("lastName");
+
+                    User postUser = new User(postUserId, firstName, lastName);
+
                     posts.add(new Post(rs.getString("postId"), rs.getString("content"), rs.getString("date"),
-                            userService.getLoggedInUser(), postService.getHeartCount(rs.getString("postId")), postService.getCommentCount(rs.getString("postId")), postService.userHearted(rs.getString("postId"),userService.getLoggedInUser().getUserId()), postService.userBookmarked(rs.getString("postId"),userService.getLoggedInUser().getUserId())));
+                           postUser , postService.getHeartCount(rs.getString("postId")), postService.getCommentCount(rs.getString("postId")), postService.userHearted(rs.getString("postId"),userService.getLoggedInUser().getUserId()), postService.userBookmarked(rs.getString("postId"),userService.getLoggedInUser().getUserId())));
                 }
             }
 
@@ -122,13 +130,14 @@ public class PeopleService {
         final String sql = isFollow
                 ? "INSERT INTO follow (followerId, followedId) VALUES (?, ?)" // Follow
                 : "DELETE FROM follow WHERE followerId = ? AND followedId = ?"; // Unfollow
-
+        
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, followerId);
             stmt.setString(2, followedId);
             stmt.executeUpdate();
         }
+
     }
     // ====================================================================================================
 }
