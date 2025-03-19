@@ -121,7 +121,7 @@ public class PeopleService {
 
         }
         
-        final String sql2 = "select * from post where userId = ?";
+        final String sql2 = "select * from post where userId = ? order by date desc";
 
         if(posts.isEmpty()){
             try (Connection conn = dataSource.getConnection();
