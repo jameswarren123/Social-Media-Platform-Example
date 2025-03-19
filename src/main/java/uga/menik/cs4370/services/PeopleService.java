@@ -120,7 +120,22 @@ public class PeopleService {
             }
 
         }
-        System.out.println(posts);
+        
+        final String sql2 = "select * from post where userId = ?";
+
+        if(posts.isEmpty()){
+            try (Connection conn = dataSource.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql2)) {
+            pstmt.setString(1, userId);
+            try(ResultSet rs = pstmt.executeQuery()){
+                while(rs.next()){
+
+                    posts.add(new Post(rs.getString("postId"), rs.getString("content"), rs.getString("date"),
+                    userService.getLoggedInUser() , postService.getHeartCount(rs.getString("postId")), postService.getCommentCount(rs.getString("postId")), postService.userHearted(rs.getString("postId"),userService.getLoggedInUser().getUserId()), postService.userBookmarked(rs.getString("postId"),userService.getLoggedInUser().getUserId())));
+                }
+            }
+        }
+        }
 
         return posts;
     }
@@ -130,6 +145,7 @@ public class PeopleService {
         final String sql = isFollow
                 ? "INSERT INTO follow (followerId, followedId) VALUES (?, ?)" // Follow
                 : "DELETE FROM follow WHERE followerId = ? AND followedId = ?"; // Unfollow
+
         
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {

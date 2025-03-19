@@ -7,6 +7,8 @@ package uga.menik.cs4370.controllers;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,7 @@ import uga.menik.cs4370.models.Post;
 import uga.menik.cs4370.utility.Utility;
 import uga.menik.cs4370.services.PeopleService;
 import uga.menik.cs4370.services.UserService;
+import javax.sql.DataSource;
 
 
 
@@ -42,12 +45,14 @@ public class HomeController {
      */
     private final UserService userService;
     private final PeopleService peopleService;
+    private final DataSource dataSource;
 
 
      @Autowired
-    public HomeController(PeopleService peopleService,UserService userService) {
+    public HomeController(PeopleService peopleService,UserService userService, DataSource dataSource) {
         this.userService = userService;
         this.peopleService = peopleService; 
+        this.dataSource = dataSource; 
     }
 
     @GetMapping
@@ -59,7 +64,7 @@ public class HomeController {
         // You should replace it with actual data from the database.
         List<Post> posts = new ArrayList<>();
         
-        try{
+        try{    
             posts = peopleService.getCreatedPosts(userService.getLoggedInUser().getUserId());
          }catch(SQLException e){
 
