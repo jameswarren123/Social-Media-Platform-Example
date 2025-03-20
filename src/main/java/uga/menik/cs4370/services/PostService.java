@@ -222,4 +222,43 @@ public class PostService {
             return rowsAffected > 0;
         }
     }
+
+    /**
+     * Retrieves all posts created by a specific user from the database.
+     * This method queries the database to fetch the posts for a given user.
+     * 
+     * @param userId The ID of the user whose posts are being fetched.
+     * @return A list of Post objects containing the user's posts.
+     * @throws SQLException If there is an issue querying the database for posts.
+     */
+    public List<Post> getUserPosts(String userId) throws SQLException {
+        List<Post> posts = new ArrayList<>();
+        final String sql = "SELECT * FROM post WHERE userId = ? ORDER BY date DESC";
+        
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, userId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String postId = rs.getString("postId");
+                    String content = rs.getString("content");
+                    String postDate = rs.getString("date");
+                    
+                    // Fetch additional post details
+                    int heartsCount = getHeartCount(postId);
+                    int commentsCount = getCommentCount(postId);
+                    boolean isHearted = userHearted(postId, userId);
+                    boolean isBookmarked = userBookmarked(postId, userId);
+                    
+                    posts.add(new Post(postId, content, postDate, getUser(userId),
+                                       heartsCount, commentsCount, isHearted, isBookmarked));
+                }
+            }
+        }
+        
+        return posts;
+    }
+    
+    
 }
