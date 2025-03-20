@@ -5,8 +5,10 @@ This is a project developed by Dr. Menik to give the students an opportunity to 
 */
 package uga.menik.cs4370.controllers;
 
+import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import uga.menik.cs4370.models.Post;
-import uga.menik.cs4370.utility.Utility;
+import uga.menik.cs4370.services.HashtagSearchService;
 
 /**
  * Handles /hashtagsearch URL and possibly others.
@@ -23,6 +25,13 @@ import uga.menik.cs4370.utility.Utility;
 @Controller
 @RequestMapping("/hashtagsearch")
 public class HashtagSearchController {
+
+    private final HashtagSearchService hashtagSearchService;
+
+    @Autowired
+    public HashtagSearchController(HashtagSearchService hashtagSearchService) {
+        this.hashtagSearchService = hashtagSearchService;
+    }
 
     /**
      * This function handles the /hashtagsearch URL itself.
@@ -40,19 +49,30 @@ public class HashtagSearchController {
 
         // Following line populates sample data.
         // You should replace it with actual data from the database.
-        List<Post> posts = Utility.createSamplePostsListWithoutComments();
-        mv.addObject("posts", posts);
+        // List<Post> posts = Utility.createSamplePostsListWithoutComments();
+        // mv.addObject("posts", posts);
 
+        try {
+            List<Post> posts = hashtagSearchService.getPostWithHashtag(hashtags);
+            if (posts == null || posts.isEmpty()) {
+                mv.addObject("isNoContent", true);
+            } else {
+                mv.addObject("posts", posts);
+            }
+        } catch (SQLException e) {
+            System.out.println("Failed followable users");
+            String errorMessage = "Some error occured!";
+            mv.addObject("errorMessage", errorMessage);
+        }
         // If an error occured, you can set the following property with the
         // error message to show the error message to the user.
-        // String errorMessage = "Some error occured!";
-        // mv.addObject("errorMessage", errorMessage);
+        //String errorMessage = "Some error occured!";
+        //mv.addObject("errorMessage", errorMessage);
 
         // Enable the following line if you want to show no content message.
         // Do that if your content list is empty.
-        // mv.addObject("isNoContent", true);
-        
+        //mv.addObject("isNoContent", true);
+
         return mv;
     }
-    
 }
