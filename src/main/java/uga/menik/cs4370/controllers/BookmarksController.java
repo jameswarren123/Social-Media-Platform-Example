@@ -5,43 +5,60 @@ This is a project developed by Dr. Menik to give the students an opportunity to 
 */
 package uga.menik.cs4370.controllers;
 
+import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import uga.menik.cs4370.models.Post;
-import uga.menik.cs4370.utility.Utility;
+import uga.menik.cs4370.services.PostService;
+import uga.menik.cs4370.services.UserService;
 
-/**
- * Handles /bookmarks and its sub URLs.
- * No other URLs at this point.
- * 
- * Learn more about @Controller here: 
- * https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller.html
- */
 @Controller
 @RequestMapping("/bookmarks")
 public class BookmarksController {
 
+    private final UserService userService;
+    private final PostService postService;
+
+    @Autowired
+    public BookmarksController(UserService userService, PostService postService) {
+        this.userService = userService;
+        this.postService = postService;
+    }
+
     /**
-     * /bookmarks URL itself is handled by this.
+     * Handles /bookmarks URL to show the logged-in user's bookmarked posts.
      */
     @GetMapping
-    public ModelAndView webpage() {
-        // posts_page is a mustache template from src/main/resources/templates.
-        // ModelAndView class enables initializing one and populating placeholders
-        // in the template using Java objects assigned to named properties.
+    public ModelAndView webpage() throws SQLException {
+        // Get the logged-in user's ID
+        String userId = userService.getLoggedInUser().getUserId();
+
+        // Fetch the user's bookmarked posts
+        List<Post> bookmarkedPosts = postService.getBookmarkedPosts(userId);
+
+        // Create the ModelAndView object to pass data to the template
         ModelAndView mv = new ModelAndView("posts_page");
 
-        // Following line populates sample data.
-        // You should replace it with actual data from the database.
-        List<Post> posts = Utility.createSamplePostsListWithoutComments();
-        mv.addObject("posts", posts);
+        // Add the posts to the model
+        mv.addObject("posts", bookmarkedPosts);
 
-        // If an error occured, you can set the following property with the
+        // If no bookmarked posts, show a "No content" message
+        if (bookmarkedPosts.isEmpty()) {
+            mv.addObject("isNoContent", true);
+        }
+
+        return mv;
+    }
+}
+
+
+    // If an error occured, you can set the following property with the
         // error message to show the error message to the user.
         // String errorMessage = "Some error occured!";
         // mv.addObject("errorMessage", errorMessage);
@@ -50,7 +67,3 @@ public class BookmarksController {
         // Do that if your content list is empty.
         // mv.addObject("isNoContent", true);
 
-        return mv;
-    }
-    
-}

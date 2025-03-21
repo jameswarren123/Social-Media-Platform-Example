@@ -148,6 +148,28 @@ public class UserService {
 
     }
 
+    public User getUserFromPostId(String postId) throws SQLException {
+        final String sql = "SELECT u.* FROM user u " +
+                           "JOIN post p ON u.userId = p.userId " +
+                           "WHERE p.postId = ?";
+    
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                
+            pstmt.setString(1, postId);
+    
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    String userId = rs.getString("userId");
+                    String firstName = rs.getString("firstName");
+                    String lastName = rs.getString("lastName");
+                    // Construct a User object and return it
+                    return new User(userId, firstName, lastName); // Assuming you have a User constructor
+                }
+            }
+        }
+        return null; // If no user found for the given postId
+    }
 
 
 }
