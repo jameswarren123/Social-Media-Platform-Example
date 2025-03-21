@@ -260,5 +260,50 @@ public class PostService {
         return posts;
     }
     
+    /**
+     * Retrieves all posts that the logged-in user has bookmarked.
+     * The posts are ordered by the most recent first.
+     * 
+     * @param userId The ID of the logged-in user whose bookmarked posts are being fetched.
+     * @return A list of Post objects representing the user's bookmarked posts.
+     * @throws SQLException If there is an issue querying the database.
+     */
+    // In BookmarksController or appropriate service
+    public List<Post> getBookmarkedPosts(String userId) throws SQLException {
+        final String sql = "SELECT p.*, " +
+                        "(SELECT COUNT(*) FROM hearts h WHERE h.postId = p.postId) AS heartsCount, " +
+                        "(SELECT COUNT(*) FROM comments c WHERE c.postId = p.postId) AS commentsCount " +
+                        "FROM post p " +
+                        "JOIN bookmark b ON p.postId = b.postId " +
+                        "WHERE b.userId = ? ORDER BY p.postDate DESC"; // Ordering by the most recent first
+
+        List<Post> bookmarkedPosts = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, userId);  // Set the logged-in userId
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    // Retrieve the post data from the result set
+                    String postId = rs.getString("postId");
+                    String content = rs.getString("content");
+                    String postDate = rs.getString("postDate");
+                    int heartsCount = rs.getInt("heartsCount");
+                    int commentsCount = rs.getInt("commentsCount");
+
+                    // Fetch the user from the UserService
+                    User user = userService.getUserFromPostId(postId);  // Ensure this method is being called
+
+                    // Create the Post object with all necessary details
+                    Post post = new Post(postId, content, postDate, user, heartsCount, commentsCount, false, true); // isBookmarked is true
+                    bookmarkedPosts.add(post);
+                }
+            }
+        }
+
+        return bookmarkedPosts;
+    }
     
 }
