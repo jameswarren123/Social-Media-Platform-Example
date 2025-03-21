@@ -270,12 +270,7 @@ public class PostService {
      */
     // In BookmarksController or appropriate service
     public List<Post> getBookmarkedPosts(String userId) throws SQLException {
-        final String sql = "SELECT p.*, " +
-                        "(SELECT COUNT(*) FROM hearts h WHERE h.postId = p.postId) AS heartsCount, " +
-                        "(SELECT COUNT(*) FROM comments c WHERE c.postId = p.postId) AS commentsCount " +
-                        "FROM post p " +
-                        "JOIN bookmark b ON p.postId = b.postId " +
-                        "WHERE b.userId = ? ORDER BY p.postDate DESC"; // Ordering by the most recent first
+        final String sql = "SELECT p.*, (SELECT COUNT(*) FROM heart h WHERE h.postId = p.postId) AS heartsCount, (SELECT COUNT(*) FROM comment c WHERE c.postId = p.postId) AS commentsCount FROM post p JOIN bookmark b ON p.postId = b.postId WHERE b.userId = ? ORDER BY p.created_at DESC;"; // Ordering by the most recent first
 
         List<Post> bookmarkedPosts = new ArrayList<>();
 
@@ -289,7 +284,7 @@ public class PostService {
                     // Retrieve the post data from the result set
                     String postId = rs.getString("postId");
                     String content = rs.getString("content");
-                    String postDate = rs.getString("postDate");
+                    String postDate = rs.getString("date");
                     int heartsCount = rs.getInt("heartsCount");
                     int commentsCount = rs.getInt("commentsCount");
 

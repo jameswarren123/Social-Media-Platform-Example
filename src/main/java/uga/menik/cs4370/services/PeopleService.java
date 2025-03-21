@@ -99,7 +99,7 @@ public class PeopleService {
     // ====================================================================================================
 
     public List<Post> getCreatedPosts(String userId) throws SQLException {
-        final String sql = "select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from post p, user u, follow f where u.userId = ? and u.userId = p.userId and p.userId = f.followerId) order by date desc;";
+        final String sql = "select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName,p.created_at from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from post p, user u, follow f where u.userId = ? and u.userId = p.userId and p.userId = f.followerId) order by p.created_at desc;";
 
         List<Post> posts = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
