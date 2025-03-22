@@ -43,7 +43,7 @@ public class PostService {
         this.userService = userService;
     }
 
-     boolean userBookmarked(String postId, String userId) throws SQLException {
+    boolean userBookmarked(String postId, String userId) throws SQLException {
         boolean bookmarked = false;
         final String sql = "select count(*) as row_count from bookmark where postId = ? and userId = ?";
         try (Connection conn = dataSource.getConnection();
@@ -58,7 +58,7 @@ public class PostService {
         return bookmarked;
     }
 
-     boolean userHearted(String postId, String userId) throws SQLException {
+    boolean userHearted(String postId, String userId) throws SQLException {
         boolean hearted = false;
         final String sql = "select count(*) as row_count from heart where postId = ? and userId = ?";
         try (Connection conn = dataSource.getConnection();
@@ -73,7 +73,7 @@ public class PostService {
         return hearted;
     }
 
-     int getCommentCount(String postId) throws SQLException {
+    int getCommentCount(String postId) throws SQLException {
         int commentCount = 0;
         final String sql = "select count(*) as row_count from comment where postId = ?";
         try (Connection conn = dataSource.getConnection();
@@ -87,7 +87,7 @@ public class PostService {
         return commentCount;
     }
 
-     int getHeartCount(String postId) throws SQLException {
+    int getHeartCount(String postId) throws SQLException {
         int heartCount = 0;
         final String sql = "select count(*) as row_count from heart where postId = ?";
         try (Connection conn = dataSource.getConnection();
@@ -101,7 +101,7 @@ public class PostService {
         return heartCount;
     }
 
-     User getUser(String userId) throws SQLException {
+    User getUser(String userId) throws SQLException {
         final String sql = "select * from user where userId = ?";
         User user = null;
         try (Connection conn = dataSource.getConnection();
@@ -118,7 +118,7 @@ public class PostService {
 
     public List<ExpandedPost> getPostComments(String postId) throws SQLException {
         List<Comment> comments = new ArrayList<>();
-        final String sql = "select * from comment where postId = ?";
+        final String sql = "select * from comment where postId = ? order by created_at desc;";
         try (Connection conn = dataSource.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, postId);
