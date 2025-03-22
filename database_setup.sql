@@ -32,7 +32,6 @@ CREATE TABLE comment(
     userId INT NOT NULL,
     commentDate VARCHAR(255) NOT NULL,
     commentText VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (commentId),
     FOREIGN KEY (postId) REFERENCES post(postId) ON DELETE CASCADE,
     FOREIGN KEY (userId) REFERENCES user(userId) ON DELETE CASCADE

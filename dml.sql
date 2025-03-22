@@ -5,7 +5,7 @@
 "insert into user (username, password, firstName, lastName) values (?, ?, ?, ?)";
 
 --insert into post table post data with post date formated properly
-"insert into post (content,userId,date) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y %h:%i %p\"))";
+"insert into post (content,userId,date) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"))";
 
 --gets all information from the user table of the user who made the post with postid
 "SELECT u.* FROM user u " +
@@ -46,7 +46,7 @@
 "delete from bookmark where postId = ? and userId = ?";
 
 --insert into comment table a comment from user with userid into post with postid with its date and text
-"insert into comment (postId,userId,commentDate,commentText) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y %h:%i %p\"),?)";
+"insert into comment (postId,userId,commentDate,commentText) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"),?)";
 
 --return all post information of all posts made by user with userid
 "SELECT * FROM post WHERE userId = ? ORDER BY date DESC";
@@ -64,7 +64,7 @@
     "FROM user u WHERE u.userId != ?";
 
 --returns all post information and user information of either the current user or any user the user follows in the follow table ordered by creation date
-"select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName,p.created_at from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from post p, user u, follow f where u.userId = ? and u.userId = p.userId and p.userId = f.followerId) order by p.created_at desc;";
+"select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName,p.created_at from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from user u, follow f where u.userId = ? and u.userId = f.followerId) order by p.created_at desc;";
 
 --select all post information in post table of all posts made by user ordered by date dsecending
 "select * from post where userId = ? order by date desc";
