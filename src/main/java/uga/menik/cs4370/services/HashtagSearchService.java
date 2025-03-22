@@ -21,11 +21,13 @@ import uga.menik.cs4370.models.User;
 public class HashtagSearchService {
     private final DataSource dataSource;
     private final PostService postService;
+    private final UserService userService;
 
     @Autowired
-    public HashtagSearchService(DataSource dataSource, PostService postService) {
+    public HashtagSearchService(DataSource dataSource, PostService postService, UserService userService) {
         this.dataSource = dataSource;
         this.postService = postService;
+        this.userService = userService;
     }
 
     public List<Post> getPostWithHashtag(String hashtags) throws SQLException {
@@ -75,12 +77,11 @@ public class HashtagSearchService {
                     while (rs.next()) {
 
                         String postId = rs.getString("postId");
-                        String userId = rs.getString("userId");
 
                         int heartCount = postService.getHeartCount(postId);
                         int commentCount = postService.getCommentCount(postId);
-                        boolean isLiked = postService.userHearted(postId, userId);
-                        boolean isBookMarked = postService.userBookmarked(postId, userId);
+                        boolean isLiked = postService.userHearted(postId, userService.getLoggedInUser().getUserId());
+                        boolean isBookMarked = postService.userBookmarked(postId, userService.getLoggedInUser().getUserId());
 
                         User user = new User(
                                 rs.getString("userId"),
