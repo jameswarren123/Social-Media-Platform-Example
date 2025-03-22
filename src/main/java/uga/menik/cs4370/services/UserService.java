@@ -133,20 +133,6 @@ public class UserService {
         }
     }
 
-    public boolean createPost(String content, String userId) throws SQLException{
-        final String postSql = "insert into post (content,userId,date) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y %h:%i %p\"))";
-
-        try(Connection conn = dataSource.getConnection();
-        PreparedStatement sqlStmt = conn.prepareStatement(postSql)){
-            sqlStmt.setString(1, content);
-            sqlStmt.setString(2, userId);
-
-            int rowsAffected = sqlStmt.executeUpdate();
-            return rowsAffected > 0;
-        }
-        
-
-    }
 
     public User getUserFromPostId(String postId) throws SQLException {
         final String sql = "SELECT u.* FROM user u " +

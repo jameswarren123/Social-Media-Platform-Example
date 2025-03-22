@@ -97,9 +97,23 @@ public class PeopleService {
         return followableUsers;
     }
     // ====================================================================================================
+    public boolean createPost(String content, String userId) throws SQLException{
+        final String postSql = "insert into post (content,userId,date) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"))";
 
+        try(Connection conn = dataSource.getConnection();
+        PreparedStatement sqlStmt = conn.prepareStatement(postSql)){
+            sqlStmt.setString(1, content);
+            sqlStmt.setString(2, userId);
+
+            int rowsAffected = sqlStmt.executeUpdate();
+            return rowsAffected > 0;
+        }
+        
+
+    }
+    
     public List<Post> getCreatedPosts(String userId) throws SQLException {
-        final String sql = "select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName,p.created_at from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from post p, user u, follow f where u.userId = ? and u.userId = p.userId and p.userId = f.followerId) order by p.created_at desc;";
+        final String sql = "select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName,p.created_at from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from user u, follow f where u.userId = ? and u.userId = f.followerId) order by p.created_at desc;";
 
         List<Post> posts = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
@@ -121,21 +135,6 @@ public class PeopleService {
 
         }
         
-        final String sql2 = "select * from post where userId = ? order by date desc";
-
-        if(posts.isEmpty()){
-            try (Connection conn = dataSource.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql2)) {
-            pstmt.setString(1, userId);
-            try(ResultSet rs = pstmt.executeQuery()){
-                while(rs.next()){
-
-                    posts.add(new Post(rs.getString("postId"), rs.getString("content"), rs.getString("date"),
-                    userService.getLoggedInUser() , postService.getHeartCount(rs.getString("postId")), postService.getCommentCount(rs.getString("postId")), postService.userHearted(rs.getString("postId"),userService.getLoggedInUser().getUserId()), postService.userBookmarked(rs.getString("postId"),userService.getLoggedInUser().getUserId())));
-                }
-            }
-        }
-        }
 
         return posts;
     }
