@@ -27,8 +27,8 @@
 --return all table information of user with userid 
 "select * from user where userId = ?";
 
---return all comment information on post with postid in descending order of creation date
-"select * from comment where postId = ? order by created_at desc;";
+--return all comment information on post with postid in descending order of creation date per id autoincrement
+"select * from comment where postId = ?;";
 
 --return all post information of post with postid
 "select * from post where postId = ?";
