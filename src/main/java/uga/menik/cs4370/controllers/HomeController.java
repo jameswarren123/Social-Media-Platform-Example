@@ -45,14 +45,12 @@ public class HomeController {
      */
     private final UserService userService;
     private final PeopleService peopleService;
-    private final DataSource dataSource;
 
 
      @Autowired
-    public HomeController(PeopleService peopleService,UserService userService, DataSource dataSource) {
+    public HomeController(PeopleService peopleService,UserService userService) {
         this.userService = userService;
         this.peopleService = peopleService; 
-        this.dataSource = dataSource; 
     }
 
     @GetMapping
@@ -67,7 +65,7 @@ public class HomeController {
         try{    
             posts = peopleService.getCreatedPosts(userService.getLoggedInUser().getUserId());
          }catch(SQLException e){
-
+             System.out.println("Failed to retrieve posts");
         }
         mv.addObject("posts", posts);
 
@@ -99,7 +97,7 @@ public class HomeController {
         // Redirect the user if the post creation is a success.
         // return "redirect:/";
         try{
-            boolean postSuccess = userService.createPost(postText, userService.getLoggedInUser().getUserId());
+            boolean postSuccess = peopleService.createPost(postText, userService.getLoggedInUser().getUserId());
             if(postSuccess){
                 return "redirect:/";
             }else{

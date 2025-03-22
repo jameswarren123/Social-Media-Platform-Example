@@ -212,7 +212,7 @@ public class PostService {
     }
 
     public boolean createComment (String comment, String postId, User user) throws SQLException{
-        final String sql = "insert into comment (postId,userId,commentDate,commentText) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y %h:%i %p\"),?)";
+        final String sql = "insert into comment (postId,userId,commentDate,commentText) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"),?)";
         try(Connection conn = dataSource.getConnection();
         PreparedStatement sqlStmt = conn.prepareStatement(sql)){
             sqlStmt.setString(1, postId);
@@ -233,7 +233,7 @@ public class PostService {
      */
     public List<Post> getUserPosts(String userId) throws SQLException {
         List<Post> posts = new ArrayList<>();
-        final String sql = "SELECT * FROM post WHERE userId = ? ORDER BY date DESC";
+        final String sql = "SELECT * FROM post WHERE userId = ? ORDER BY created_at DESC";
         
         try (Connection conn = dataSource.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -292,7 +292,7 @@ public class PostService {
                     User user = userService.getUserFromPostId(postId);  // Ensure this method is being called
 
                     // Create the Post object with all necessary details
-                    Post post = new Post(postId, content, postDate, user, heartsCount, commentsCount, false, true); // isBookmarked is true
+                    Post post = new Post(postId, content, postDate, user, heartsCount, commentsCount, userHearted(postId, userId), true); // isBookmarked is true
                     bookmarkedPosts.add(post);
                 }
             }
