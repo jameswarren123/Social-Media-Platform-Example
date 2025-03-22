@@ -230,7 +230,7 @@ public class PostService {
                     // Fetch additional post details
                     int heartsCount = getHeartCount(postId);
                     int commentsCount = getCommentCount(postId);
-                    boolean isHearted = userHearted(postId, userId);
+                    boolean isHearted = userHearted(postId, userService.getLoggedInUser().getUserId());
                     boolean isBookmarked = userBookmarked(postId, userId);
                     
                     posts.add(new Post(postId, content, postDate, getUser(userId),

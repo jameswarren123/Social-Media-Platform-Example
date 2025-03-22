@@ -24,7 +24,8 @@ CREATE TABLE post(
     content VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (postId),
-    FOREIGN KEY (userId) REFERENCES user(userId) ON DELETE CASCADE
+    FOREIGN KEY (userId) REFERENCES user(userId) ON DELETE CASCADE,
+    constraint content_min_length check (char_length(trim(content)) >= 1)
 );
 CREATE TABLE comment(
     commentId INT NOT NULL AUTO_INCREMENT,
