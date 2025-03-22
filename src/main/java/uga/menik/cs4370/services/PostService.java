@@ -118,7 +118,7 @@ public class PostService {
 
     public List<ExpandedPost> getPostComments(String postId) throws SQLException {
         List<Comment> comments = new ArrayList<>();
-        final String sql = "select * from comment where postId = ?";
+        final String sql = "select * from comment where postId = ? order by created_at desc;";
         try (Connection conn = dataSource.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, postId);
@@ -212,7 +212,7 @@ public class PostService {
     }
 
     public boolean createComment (String comment, String postId, User user) throws SQLException{
-        final String sql = "insert into comment (postId,userId,commentDate,commentText) values (?,?,NOW(),?)";
+        final String sql = "insert into comment (postId,userId,commentDate,commentText) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y %h:%i %p\"),?)";
         try(Connection conn = dataSource.getConnection();
         PreparedStatement sqlStmt = conn.prepareStatement(sql)){
             sqlStmt.setString(1, postId);
