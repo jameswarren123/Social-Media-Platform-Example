@@ -57,7 +57,7 @@
 --of posts which user with userid is associated with in bookmark table
 "SELECT p.*, (SELECT COUNT(*) FROM heart h WHERE h.postId = p.postId) AS heartsCount, (SELECT COUNT(*) FROM comment c WHERE c.postId = p.postId) AS commentsCount FROM post p JOIN bookmark b ON p.postId = b.postId WHERE b.userId = ? ORDER BY p.created_at DESC;";
 
---NEEDS HELP
+--retrieves a list of users (excluding a given user), indicating whether the given user follows them and the date of their most recent post.
 "SELECT u.userId, u.firstName, u.lastName, " +
     "EXISTS (SELECT 1 FROM follow f WHERE f.followerId = ? AND f.followedId = u.userId) AS isFollowed, " +
     "(SELECT MAX(p.created_at) FROM post p WHERE p.userId = u.userId) AS lastPostDate " +
@@ -77,3 +77,11 @@
 
 --NEEDS HELP in Hashtag Service
 "";
+
+--retrieves all information about the user who created a specific post, identified by its postId
+"SELECT u.* FROM user u " + 
+"JOIN post p ON u.userId = p.userId " +
+"WHERE p.postId = ?"
+
+--retrieves all posts made by a specific user, ordered from the most recent to the oldest based on the created_at timestamp
+"SELECT * FROM post WHERE userId = ? ORDER BY created_at DESC"
