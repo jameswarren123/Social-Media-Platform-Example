@@ -85,3 +85,38 @@
 
 --retrieves all posts made by a specific user, ordered from the most recent to the oldest based on the created_at timestamp
 "SELECT * FROM post WHERE userId = ? ORDER BY created_at DESC"
+
+--http://localhost:8081/hashtagsearch?hashtags=%23dogs (where hashtag input is dogs)
+--http://localhost:8081/hashtagsearch?hashtags=%23dogs+%23soloLeveling (where hashtag input is dogs & soloLeveling)
+--This is a dynamic query because it adjusts based on the number of hashes in user input.
+--It selects post and user information based on a generic expression beginning with a hash
+--and having a few other constraints. It looks for this substring in content and displays
+--in the order of the hashes in the search.
+"SELECT p.postId, p.content, p.created_at, p.userId, " +
+"u.firstName, u.lastName FROM Post p JOIN User u ON p.userId = u.userId WHERE "
+/*
+    for (int i = 0; i < hashtagList.size(); i++) {
+        sql.append("p.content LIKE ?");
+        if (i < hashtagList.size() - 1) {
+            sql.append(" OR ");
+        }
+
+    for (int i = 0; i < hashtagList.size(); i++) {
+        pstmt.setString(i + 1, "%" + hashtagList.get(i) + "%");
+    }
+*/
+
+--http://localhost:8081/people
+--THis updates the isFollowed UI icon and lastPostDate value on the people page. It also provides
+--users that are not the logged in user.
+"SELECT u.userId, u.firstName, u.lastName, " +
+"EXISTS (SELECT 1 FROM follow f WHERE f.followerId = ? AND f.followedId = u.userId) AS isFollowed, " +
+"(SELECT MAX(p.created_at) FROM post p WHERE p.userId = u.userId) AS lastPostDate " +
+"FROM user u WHERE u.userId != ?"
+
+--http://localhost:8081/people
+--The following two SQL statements were apart of the same ternary operator.
+--It is the basic insert and delete from the follow table based on the one
+--followed and the follower. Does the proper operation based on user action.
+"INSERT INTO follow (followerId, followedId) VALUES (?, ?)"
+"DELETE FROM follow WHERE followerId = ? AND followedId = ?"
