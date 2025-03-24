@@ -54,9 +54,9 @@ public class HashtagSearchService {
         List<Post> postObjsWithHashtag = new ArrayList<>();
 
         if (!hashtagList.isEmpty()) {
-            StringBuilder sql = new StringBuilder("SELECT p.postId, p.content, p.created_at, p.userId, " +
-                    "u.firstName, u.lastName FROM Post p JOIN User u ON p.userId = u.userId WHERE ");
-
+                StringBuilder sql = new StringBuilder("SELECT p.postId, p.content, p.created_at, p.userId, " +
+                        "u.firstName, u.lastName FROM Post p JOIN User u ON p.userId = u.userId WHERE ");
+                
             for (int i = 0; i < hashtagList.size(); i++) {
                 sql.append("p.content LIKE ?");
                 if (i < hashtagList.size() - 1) {

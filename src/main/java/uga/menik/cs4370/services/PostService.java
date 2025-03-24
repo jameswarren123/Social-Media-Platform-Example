@@ -46,13 +46,18 @@ public class PostService {
     boolean userBookmarked(String postId, String userId) throws SQLException {
         boolean bookmarked = false;
         final String sql = "select count(*) as row_count from bookmark where postId = ? and userId = ?";
+        System.out.println("select count(*) as row_count from bookmark where postId = ? and userId = ?");
+        System.out.println("");
+        System.out.println("");
+
         try (Connection conn = dataSource.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, postId);
             pstmt.setString(2, userId);
-            try(ResultSet rs = pstmt.executeQuery()) {
+            try (ResultSet rs = pstmt.executeQuery()) {
                 rs.next();
-                if(Integer.parseInt(rs.getString("row_count")) > 0) bookmarked = true;           
+                if (Integer.parseInt(rs.getString("row_count")) > 0)
+                    bookmarked = true;
             }
         }
         return bookmarked;
@@ -61,13 +66,18 @@ public class PostService {
     boolean userHearted(String postId, String userId) throws SQLException {
         boolean hearted = false;
         final String sql = "select count(*) as row_count from heart where postId = ? and userId = ?";
+        System.out.println("select count(*) as row_count from heart where postId = ? and userId = ?");
+        System.out.println("");
+        System.out.println("");
+
         try (Connection conn = dataSource.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, postId);
             pstmt.setString(2, userId);
-            try(ResultSet rs = pstmt.executeQuery()) {
+            try (ResultSet rs = pstmt.executeQuery()) {
                 rs.next();
-                if(Integer.parseInt(rs.getString("row_count")) > 0) hearted = true;           
+                if (Integer.parseInt(rs.getString("row_count")) > 0)
+                    hearted = true;
             }
         }
         return hearted;
@@ -76,10 +86,14 @@ public class PostService {
     int getCommentCount(String postId) throws SQLException {
         int commentCount = 0;
         final String sql = "select count(*) as row_count from comment where postId = ?";
+        System.out.println("select count(*) as row_count from comment where postId = ?");
+        System.out.println("");
+        System.out.println("");
+
         try (Connection conn = dataSource.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, postId);
-            try(ResultSet rs = pstmt.executeQuery()) {
+            try (ResultSet rs = pstmt.executeQuery()) {
                 rs.next();
                 commentCount = Integer.parseInt(rs.getString("row_count"));
             }
@@ -90,10 +104,14 @@ public class PostService {
     int getHeartCount(String postId) throws SQLException {
         int heartCount = 0;
         final String sql = "select count(*) as row_count from heart where postId = ?";
+        System.out.println("select count(*) as row_count from heart where postId = ?");
+        System.out.println("");
+        System.out.println("");
+
         try (Connection conn = dataSource.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, postId);
-            try(ResultSet rs = pstmt.executeQuery()) {
+            try (ResultSet rs = pstmt.executeQuery()) {
                 rs.next();
                 heartCount = Integer.parseInt(rs.getString("row_count"));
             }
@@ -103,11 +121,15 @@ public class PostService {
 
     User getUser(String userId) throws SQLException {
         final String sql = "select * from user where userId = ?";
+        System.out.println("select * from user where userId = ?");
+        System.out.println("");
+        System.out.println("");
+
         User user = null;
         try (Connection conn = dataSource.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, userId);
-            try(ResultSet rs = pstmt.executeQuery()) {
+            try (ResultSet rs = pstmt.executeQuery()) {
                 rs.next();
                 user = new User(userId, rs.getString("firstName"), rs.getString("lastName"));
             }
@@ -118,18 +140,26 @@ public class PostService {
 
     public List<ExpandedPost> getPostComments(String postId) throws SQLException {
         List<Comment> comments = new ArrayList<>();
+<<<<<<< Updated upstream
         final String sql = "select * from comment where postId = ? order by created_at desc;";
+=======
+        final String sql = "select * from comment where postId = ?;";
+        System.out.println("select * from comment where postId = ?;");
+        System.out.println("");
+        System.out.println("");
+
+>>>>>>> Stashed changes
         try (Connection conn = dataSource.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, postId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     comments.add(new Comment(rs.getString("postId"), rs.getString("commentText"),
-                        rs.getString("commentDate"), this.getUser(rs.getString("userId"))));
+                            rs.getString("commentDate"), this.getUser(rs.getString("userId"))));
                 }
             }
         }
-        
+
         String content = null;
         String postDate = null;
         User user = null;
@@ -138,8 +168,12 @@ public class PostService {
         boolean isHearted = false;
         boolean isBookmarked = false;
         final String sql1 = "select * from post where postId = ?";
+        System.out.println("select * from post where postId = ?");
+        System.out.println("");
+        System.out.println("");
+
         try (Connection conn = dataSource.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql1)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql1)) {
             pstmt.setString(1, postId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -151,23 +185,28 @@ public class PostService {
                     System.out.println("through get heart count");
                     commentsCount = this.getCommentCount(postId);
                     System.out.println("through get comment count");
-                    isHearted = this.userHearted(postId, userService.getLoggedInUser().getUserId());  
-                    System.out.println("through user hearted count");  
+                    isHearted = this.userHearted(postId, userService.getLoggedInUser().getUserId());
+                    System.out.println("through user hearted count");
                     isBookmarked = this.userBookmarked(postId, userService.getLoggedInUser().getUserId());
                     System.out.println("through get bookmarked count");
                 }
             }
         }
-        //need full post plus comments
-        ExpandedPost postWithComments = new ExpandedPost(postId, content, postDate, user, heartsCount, commentsCount, isHearted, isBookmarked, comments);
+        // need full post plus comments
+        ExpandedPost postWithComments = new ExpandedPost(postId, content, postDate, user, heartsCount, commentsCount,
+                isHearted, isBookmarked, comments);
         return List.of(postWithComments);
     }
 
-    public boolean likePost(boolean isAdd, String postId, User user) throws SQLException{
-        if(isAdd){
+    public boolean likePost(boolean isAdd, String postId, User user) throws SQLException {
+        if (isAdd) {
             final String sql = "insert into heart (postId,userId) values (?,?)";
-            try(Connection conn = dataSource.getConnection();
-            PreparedStatement sqlStmt = conn.prepareStatement(sql)){
+            System.out.println("insert into heart (postId,userId) values (?,?)");
+            System.out.println("");
+            System.out.println("");
+
+            try (Connection conn = dataSource.getConnection();
+                    PreparedStatement sqlStmt = conn.prepareStatement(sql)) {
                 sqlStmt.setString(1, postId);
                 sqlStmt.setString(2, user.getUserId());
 
@@ -176,8 +215,12 @@ public class PostService {
             }
         } else {
             final String sql = "delete from heart where postId = ? and userId = ?";
-            try(Connection conn = dataSource.getConnection();
-            PreparedStatement sqlStmt = conn.prepareStatement(sql)){
+            System.out.println("delete from heart where postId = ? and userId = ?");
+            System.out.println("");
+            System.out.println("");
+
+            try (Connection conn = dataSource.getConnection();
+                    PreparedStatement sqlStmt = conn.prepareStatement(sql)) {
                 sqlStmt.setString(1, postId);
                 sqlStmt.setString(2, user.getUserId());
 
@@ -186,12 +229,16 @@ public class PostService {
             }
         }
     }
-    
-    public boolean bookmarkPost(boolean isAdd, String postId, User user) throws SQLException{
-        if(isAdd){
+
+    public boolean bookmarkPost(boolean isAdd, String postId, User user) throws SQLException {
+        if (isAdd) {
             final String sql = "insert into bookmark (postId,userId) values (?,?)";
-            try(Connection conn = dataSource.getConnection();
-            PreparedStatement sqlStmt = conn.prepareStatement(sql)){
+            System.out.println("insert into bookmark (postId,userId) values (?,?)");
+            System.out.println("");
+            System.out.println("");
+
+            try (Connection conn = dataSource.getConnection();
+                    PreparedStatement sqlStmt = conn.prepareStatement(sql)) {
                 sqlStmt.setString(1, postId);
                 sqlStmt.setString(2, user.getUserId());
 
@@ -200,8 +247,12 @@ public class PostService {
             }
         } else {
             final String sql = "delete from bookmark where postId = ? and userId = ?";
-            try(Connection conn = dataSource.getConnection();
-            PreparedStatement sqlStmt = conn.prepareStatement(sql)){
+            System.out.println("delete from bookmark where postId = ? and userId = ?");
+            System.out.println("");
+            System.out.println("");
+
+            try (Connection conn = dataSource.getConnection();
+                    PreparedStatement sqlStmt = conn.prepareStatement(sql)) {
                 sqlStmt.setString(1, postId);
                 sqlStmt.setString(2, user.getUserId());
 
@@ -211,10 +262,15 @@ public class PostService {
         }
     }
 
-    public boolean createComment (String comment, String postId, User user) throws SQLException{
+    public boolean createComment(String comment, String postId, User user) throws SQLException {
         final String sql = "insert into comment (postId,userId,commentDate,commentText) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"),?)";
-        try(Connection conn = dataSource.getConnection();
-        PreparedStatement sqlStmt = conn.prepareStatement(sql)){
+        System.out.println(
+                "insert into comment (postId,userId,commentDate,commentText) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"),?)");
+        System.out.println("");
+        System.out.println("");
+
+        try (Connection conn = dataSource.getConnection();
+                PreparedStatement sqlStmt = conn.prepareStatement(sql)) {
             sqlStmt.setString(1, postId);
             sqlStmt.setString(2, user.getUserId());
             sqlStmt.setString(3, comment);
@@ -223,6 +279,7 @@ public class PostService {
         }
     }
 
+<<<<<<< Updated upstream
     /**
      * Retrieves all posts created by a specific user from the database.
      * This method queries the database to fetch the posts for a given user.
@@ -231,34 +288,40 @@ public class PostService {
      * @return A list of Post objects containing the user's posts.
      * @throws SQLException If there is an issue querying the database for posts.
      */
+=======
+>>>>>>> Stashed changes
     public List<Post> getUserPosts(String userId) throws SQLException {
         List<Post> posts = new ArrayList<>();
         final String sql = "SELECT * FROM post WHERE userId = ? ORDER BY created_at DESC";
-        
+        System.out.println("SELECT * FROM post WHERE userId = ? ORDER BY created_at DESC");
+        System.out.println("");
+        System.out.println("");
+
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, userId);
-            
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     String postId = rs.getString("postId");
                     String content = rs.getString("content");
                     String postDate = rs.getString("date");
-                    
+
                     // Fetch additional post details
                     int heartsCount = getHeartCount(postId);
                     int commentsCount = getCommentCount(postId);
                     boolean isHearted = userHearted(postId, userId);
                     boolean isBookmarked = userBookmarked(postId, userId);
-                    
+
                     posts.add(new Post(postId, content, postDate, getUser(userId),
-                                       heartsCount, commentsCount, isHearted, isBookmarked));
+                            heartsCount, commentsCount, isHearted, isBookmarked));
                 }
             }
         }
-        
+
         return posts;
     }
+<<<<<<< Updated upstream
     
     /**
      * Retrieves all posts that the logged-in user has bookmarked.
@@ -268,16 +331,28 @@ public class PostService {
      * @return A list of Post objects representing the user's bookmarked posts.
      * @throws SQLException If there is an issue querying the database.
      */
+=======
+
+>>>>>>> Stashed changes
     // In BookmarksController or appropriate service
     public List<Post> getBookmarkedPosts(String userId) throws SQLException {
-        final String sql = "SELECT p.*, (SELECT COUNT(*) FROM heart h WHERE h.postId = p.postId) AS heartsCount, (SELECT COUNT(*) FROM comment c WHERE c.postId = p.postId) AS commentsCount FROM post p JOIN bookmark b ON p.postId = b.postId WHERE b.userId = ? ORDER BY p.created_at DESC;"; // Ordering by the most recent first
+        final String sql = "SELECT p.*, (SELECT COUNT(*) FROM heart h WHERE h.postId = p.postId) AS heartsCount, (SELECT COUNT(*) FROM comment c WHERE c.postId = p.postId) AS commentsCount FROM post p JOIN bookmark b ON p.postId = b.postId WHERE b.userId = ? ORDER BY p.created_at DESC;"; // Ordering
+                                                                                                                                                                                                                                                                                                 // by
+                                                                                                                                                                                                                                                                                                 // the
+                                                                                                                                                                                                                                                                                                 // most
+                                                                                                                                                                                                                                                                                                 // recent
+                                                                                                                                                                                                                                                                                                 // first
+        System.out.println(
+                "SELECT p.*, (SELECT COUNT(*) FROM heart h WHERE h.postId = p.postId) AS heartsCount, (SELECT COUNT(*) FROM comment c WHERE c.postId = p.postId) AS commentsCount FROM post p JOIN bookmark b ON p.postId = b.postId WHERE b.userId = ? ORDER BY p.created_at DESC;");
+        System.out.println("");
+        System.out.println("");
 
         List<Post> bookmarkedPosts = new ArrayList<>();
 
         try (Connection conn = dataSource.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, userId);  // Set the logged-in userId
+            pstmt.setString(1, userId); // Set the logged-in userId
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -289,10 +364,11 @@ public class PostService {
                     int commentsCount = rs.getInt("commentsCount");
 
                     // Fetch the user from the UserService
-                    User user = userService.getUserFromPostId(postId);  // Ensure this method is being called
+                    User user = userService.getUserFromPostId(postId); // Ensure this method is being called
 
                     // Create the Post object with all necessary details
-                    Post post = new Post(postId, content, postDate, user, heartsCount, commentsCount, userHearted(postId, userId), true); // isBookmarked is true
+                    Post post = new Post(postId, content, postDate, user, heartsCount, commentsCount,
+                            userHearted(postId, userId), true); // isBookmarked is true
                     bookmarkedPosts.add(post);
                 }
             }
@@ -300,5 +376,5 @@ public class PostService {
 
         return bookmarkedPosts;
     }
-    
+
 }

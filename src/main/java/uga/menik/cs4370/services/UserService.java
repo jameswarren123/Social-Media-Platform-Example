@@ -34,7 +34,7 @@ public class UserService {
     private final DataSource dataSource;
     // passwordEncoder is used for password security.
     private final BCryptPasswordEncoder passwordEncoder;
-    // This holds 
+    // This holds
     private User loggedInUser = null;
 
     /**
@@ -53,8 +53,12 @@ public class UserService {
      * Returns true if authentication is succesful. False otherwise.
      */
     public boolean authenticate(String username, String password) throws SQLException {
-        // Note the ? mark in the query. It is a place holder that we will later replace.
+        // Note the ? mark in the query. It is a place holder that we will later
+        // replace.
         final String sql = "select * from user where username = ?";
+        System.out.println("select * from user where username = ?");
+        System.out.println("");
+        System.out.println("");
 
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -64,13 +68,13 @@ public class UserService {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 // Traverse the result rows one at a time.
-                // Note: This specific while loop will only run at most once 
+                // Note: This specific while loop will only run at most once
                 // since username is unique.
                 while (rs.next()) {
                     // Note: rs.get.. functions access attributes of the current row.
                     String storedPasswordHash = rs.getString("password");
                     boolean isPassMatch = passwordEncoder.matches(password, storedPasswordHash);
-                    // Note: 
+                    // Note:
                     if (isPassMatch) {
                         String userId = rs.getString("userId");
                         String firstName = rs.getString("firstName");
@@ -116,8 +120,12 @@ public class UserService {
      */
     public boolean registerUser(String username, String password, String firstName, String lastName)
             throws SQLException {
-        // Note the ? marks in the SQL statement. They are placeholders like mentioned above.
+        // Note the ? marks in the SQL statement. They are placeholders like mentioned
+        // above.
         final String registerSql = "insert into user (username, password, firstName, lastName) values (?, ?, ?, ?)";
+        System.out.println("insert into user (username, password, firstName, lastName) values (?, ?, ?, ?)");
+        System.out.println("");
+        System.out.println("");
 
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement registerStmt = conn.prepareStatement(registerSql)) {
@@ -133,17 +141,21 @@ public class UserService {
         }
     }
 
-
     public User getUserFromPostId(String postId) throws SQLException {
         final String sql = "SELECT u.* FROM user u " +
-                           "JOIN post p ON u.userId = p.userId " +
-                           "WHERE p.postId = ?";
-    
+                "JOIN post p ON u.userId = p.userId " +
+                "WHERE p.postId = ?";
+        System.out.println("SELECT u.* FROM user u " +
+                "JOIN post p ON u.userId = p.userId " +
+                "WHERE p.postId = ?");
+        System.out.println("");
+        System.out.println("");
+
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, postId);
-    
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     String userId = rs.getString("userId");
@@ -156,6 +168,5 @@ public class UserService {
         }
         return null; // If no user found for the given postId
     }
-
 
 }

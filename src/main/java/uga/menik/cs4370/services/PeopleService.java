@@ -67,6 +67,12 @@ public class PeopleService {
                 "EXISTS (SELECT 1 FROM follow f WHERE f.followerId = ? AND f.followedId = u.userId) AS isFollowed, " +
                 "(SELECT MAX(p.created_at) FROM post p WHERE p.userId = u.userId) AS lastPostDate " +
                 "FROM user u WHERE u.userId != ?";
+        System.out.println("SELECT u.userId, u.firstName, u.lastName, " +
+                "EXISTS (SELECT 1 FROM follow f WHERE f.followerId = ? AND f.followedId = u.userId) AS isFollowed, " +
+                "(SELECT MAX(p.created_at) FROM post p WHERE p.userId = u.userId) AS lastPostDate " +
+                "FROM user u WHERE u.userId != ?");
+        System.out.println("");
+        System.out.println("");
 
         List<FollowableUser> followableUsers = new ArrayList<>();
 
@@ -96,24 +102,32 @@ public class PeopleService {
         }
         return followableUsers;
     }
-    // ====================================================================================================
-    public boolean createPost(String content, String userId) throws SQLException{
-        final String postSql = "insert into post (content,userId,date) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"))";
 
-        try(Connection conn = dataSource.getConnection();
-        PreparedStatement sqlStmt = conn.prepareStatement(postSql)){
+    // ====================================================================================================
+    public boolean createPost(String content, String userId) throws SQLException {
+        final String postSql = "insert into post (content,userId,date) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"))";
+        System.out.println(
+                "insert into post (content,userId,date) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"))");
+        System.out.println("");
+        System.out.println("");
+
+        try (Connection conn = dataSource.getConnection();
+                PreparedStatement sqlStmt = conn.prepareStatement(postSql)) {
             sqlStmt.setString(1, content);
             sqlStmt.setString(2, userId);
 
             int rowsAffected = sqlStmt.executeUpdate();
             return rowsAffected > 0;
         }
-        
 
     }
-    
+
     public List<Post> getCreatedPosts(String userId) throws SQLException {
         final String sql = "select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName,p.created_at from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from user u, follow f where u.userId = ? and u.userId = f.followerId) order by p.created_at desc;";
+        System.out.println(
+                "select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName,p.created_at from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from user u, follow f where u.userId = ? and u.userId = f.followerId) order by p.created_at desc;");
+        System.out.println("");
+        System.out.println("");
 
         List<Post> posts = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
@@ -129,12 +143,43 @@ public class PeopleService {
                     User postUser = new User(postUserId, firstName, lastName);
 
                     posts.add(new Post(rs.getString("postId"), rs.getString("content"), rs.getString("date"),
-                           postUser , postService.getHeartCount(rs.getString("postId")), postService.getCommentCount(rs.getString("postId")), postService.userHearted(rs.getString("postId"),userService.getLoggedInUser().getUserId()), postService.userBookmarked(rs.getString("postId"),userService.getLoggedInUser().getUserId())));
+                            postUser, postService.getHeartCount(rs.getString("postId")),
+                            postService.getCommentCount(rs.getString("postId")),
+                            postService.userHearted(rs.getString("postId"), userService.getLoggedInUser().getUserId()),
+                            postService.userBookmarked(rs.getString("postId"),
+                                    userService.getLoggedInUser().getUserId())));
                 }
             }
 
         }
+<<<<<<< Updated upstream
         
+=======
+
+        final String sql2 = "select * from post where userId = ?";
+        System.out.println("select * from post where userId = ?");
+        System.out.println("");
+        System.out.println("");
+
+        if (posts.isEmpty()) {
+            try (Connection conn = dataSource.getConnection();
+                    PreparedStatement pstmt = conn.prepareStatement(sql2)) {
+                pstmt.setString(1, userId);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    while (rs.next()) {
+
+                        posts.add(new Post(rs.getString("postId"), rs.getString("content"), rs.getString("date"),
+                                userService.getLoggedInUser(), postService.getHeartCount(rs.getString("postId")),
+                                postService.getCommentCount(rs.getString("postId")),
+                                postService.userHearted(rs.getString("postId"),
+                                        userService.getLoggedInUser().getUserId()),
+                                postService.userBookmarked(rs.getString("postId"),
+                                        userService.getLoggedInUser().getUserId())));
+                    }
+                }
+            }
+        }
+>>>>>>> Stashed changes
 
         return posts;
     }
@@ -144,8 +189,10 @@ public class PeopleService {
         final String sql = isFollow
                 ? "INSERT INTO follow (followerId, followedId) VALUES (?, ?)" // Follow
                 : "DELETE FROM follow WHERE followerId = ? AND followedId = ?"; // Unfollow
+        System.out.println("insert or delete follow");
+        System.out.println("");
+        System.out.println("");
 
-        
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, followerId);
