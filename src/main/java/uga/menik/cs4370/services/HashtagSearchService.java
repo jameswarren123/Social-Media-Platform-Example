@@ -16,6 +16,7 @@ import org.springframework.web.context.annotation.SessionScope;
 import uga.menik.cs4370.models.Post;
 import uga.menik.cs4370.models.User;
 
+
 @Service
 @SessionScope
 public class HashtagSearchService {

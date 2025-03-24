@@ -106,8 +106,7 @@ public class PeopleService {
     // ====================================================================================================
     public boolean createPost(String content, String userId) throws SQLException {
         final String postSql = "insert into post (content,userId,date) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"))";
-        System.out.println(
-                "insert into post (content,userId,date) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"))");
+        System.out.println("insert into post (content,userId,date) values (?,?,DATE_FORMAT(now(), \"%M %e,%Y, %h:%i %p\"))");
         System.out.println("");
         System.out.println("");
 
@@ -124,8 +123,7 @@ public class PeopleService {
 
     public List<Post> getCreatedPosts(String userId) throws SQLException {
         final String sql = "select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName,p.created_at from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from user u, follow f where u.userId = ? and u.userId = f.followerId) order by p.created_at desc;";
-        System.out.println(
-                "select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName,p.created_at from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from user u, follow f where u.userId = ? and u.userId = f.followerId) order by p.created_at desc;");
+        System.out.println("select distinct p.postId,p.content, p.date, p.userId, u.firstName, u.lastName,p.created_at from post p, follow f,user u where u.userId = ? and u.userId = p.userId or u.userId = p.userId and p.userId = some (select distinct f.followedId from user u, follow f where u.userId = ? and u.userId = f.followerId) order by p.created_at desc;");
         System.out.println("");
         System.out.println("");
 
@@ -152,9 +150,6 @@ public class PeopleService {
             }
 
         }
-<<<<<<< Updated upstream
-        
-=======
 
         final String sql2 = "select * from post where userId = ?";
         System.out.println("select * from post where userId = ?");
@@ -179,7 +174,6 @@ public class PeopleService {
                 }
             }
         }
->>>>>>> Stashed changes
 
         return posts;
     }

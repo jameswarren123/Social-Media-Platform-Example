@@ -89,10 +89,6 @@
 --delete from follow table that user of followerId followed user of followedId
 "DELETE FROM follow WHERE followerId = ? AND followedId = ?";
 
-<<<<<<< Updated upstream
---NEEDS HELP in Hashtag Service
-"";
-=======
 --retrieves all information about the user who created a specific post, identified by its postId
 "SELECT u.* FROM user u " + 
 "JOIN post p ON u.userId = p.userId " +
@@ -135,4 +131,4 @@
 --followed and the follower. Does the proper operation based on user action.
 "INSERT INTO follow (followerId, followedId) VALUES (?, ?)"
 "DELETE FROM follow WHERE followerId = ? AND followedId = ?"
->>>>>>> Stashed changes
+

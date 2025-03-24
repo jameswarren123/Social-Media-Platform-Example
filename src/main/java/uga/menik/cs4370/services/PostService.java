@@ -140,15 +140,11 @@ public class PostService {
 
     public List<ExpandedPost> getPostComments(String postId) throws SQLException {
         List<Comment> comments = new ArrayList<>();
-<<<<<<< Updated upstream
-        final String sql = "select * from comment where postId = ? order by created_at desc;";
-=======
         final String sql = "select * from comment where postId = ?;";
         System.out.println("select * from comment where postId = ?;");
         System.out.println("");
         System.out.println("");
 
->>>>>>> Stashed changes
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, postId);
@@ -279,17 +275,6 @@ public class PostService {
         }
     }
 
-<<<<<<< Updated upstream
-    /**
-     * Retrieves all posts created by a specific user from the database.
-     * This method queries the database to fetch the posts for a given user.
-     * 
-     * @param userId The ID of the user whose posts are being fetched.
-     * @return A list of Post objects containing the user's posts.
-     * @throws SQLException If there is an issue querying the database for posts.
-     */
-=======
->>>>>>> Stashed changes
     public List<Post> getUserPosts(String userId) throws SQLException {
         List<Post> posts = new ArrayList<>();
         final String sql = "SELECT * FROM post WHERE userId = ? ORDER BY created_at DESC";
@@ -321,29 +306,10 @@ public class PostService {
 
         return posts;
     }
-<<<<<<< Updated upstream
-    
-    /**
-     * Retrieves all posts that the logged-in user has bookmarked.
-     * The posts are ordered by the most recent first.
-     * 
-     * @param userId The ID of the logged-in user whose bookmarked posts are being fetched.
-     * @return A list of Post objects representing the user's bookmarked posts.
-     * @throws SQLException If there is an issue querying the database.
-     */
-=======
-
->>>>>>> Stashed changes
     // In BookmarksController or appropriate service
     public List<Post> getBookmarkedPosts(String userId) throws SQLException {
-        final String sql = "SELECT p.*, (SELECT COUNT(*) FROM heart h WHERE h.postId = p.postId) AS heartsCount, (SELECT COUNT(*) FROM comment c WHERE c.postId = p.postId) AS commentsCount FROM post p JOIN bookmark b ON p.postId = b.postId WHERE b.userId = ? ORDER BY p.created_at DESC;"; // Ordering
-                                                                                                                                                                                                                                                                                                 // by
-                                                                                                                                                                                                                                                                                                 // the
-                                                                                                                                                                                                                                                                                                 // most
-                                                                                                                                                                                                                                                                                                 // recent
-                                                                                                                                                                                                                                                                                                 // first
-        System.out.println(
-                "SELECT p.*, (SELECT COUNT(*) FROM heart h WHERE h.postId = p.postId) AS heartsCount, (SELECT COUNT(*) FROM comment c WHERE c.postId = p.postId) AS commentsCount FROM post p JOIN bookmark b ON p.postId = b.postId WHERE b.userId = ? ORDER BY p.created_at DESC;");
+        final String sql = "SELECT p.*, (SELECT COUNT(*) FROM heart h WHERE h.postId = p.postId) AS heartsCount, (SELECT COUNT(*) FROM comment c WHERE c.postId = p.postId) AS commentsCount FROM post p JOIN bookmark b ON p.postId = b.postId WHERE b.userId = ? ORDER BY p.created_at DESC;"; // Ordering by the most recent first
+        System.out.println("SELECT p.*, (SELECT COUNT(*) FROM heart h WHERE h.postId = p.postId) AS heartsCount, (SELECT COUNT(*) FROM comment c WHERE c.postId = p.postId) AS commentsCount FROM post p JOIN bookmark b ON p.postId = b.postId WHERE b.userId = ? ORDER BY p.created_at DESC;");
         System.out.println("");
         System.out.println("");
 
